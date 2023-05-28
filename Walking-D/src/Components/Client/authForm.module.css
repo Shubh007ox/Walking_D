@@ -1,0 +1,74 @@
+.form-container {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f8f8f8;
+  border-radius: 5px;
+  box-shadow: 0 4px 2px rgba(200, 75, 75, 0.1);
+}
+
+h2 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Form label */
+.label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+  
+  /* Form control */
+  .input[type="text"],
+  .input[type="email"],
+  .input[type="password"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-bottom: 10px;
+  }
+  
+  /* Form group */
+  .form-group {
+    margin-bottom: 15px;
+  }
+
+  .toggle{
+    /* position: relative;
+    display: inline-block; */
+    width: 250px;
+    height: 34px;
+    padding: 3px;
+    margin-left: 4px;
+  }
+.toggle input[type="checkbox"] {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  .btn1{
+    margin-top: 8px;
+    padding: 5px;
+  }
+  .btn2{
+    margin-top: 8px;
+    padding: 5px;
+  }
+  .btn3{
+     margin-top: 8px;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* background-color: #db4437; */
+    cursor: pointer;
+  }
+  
