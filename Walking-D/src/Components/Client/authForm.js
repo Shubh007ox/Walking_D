@@ -9,10 +9,16 @@ import Form from "react-bootstrap/Form";
 import FormLabel from "react-bootstrap/esm/FormLabel";
 import FormControl from "react-bootstrap/esm/FormControl";
 import FormGroup from "react-bootstrap/esm/FormGroup";
+import Container from "react-bootstrap/Container";
+import { signInWithPopup } from "firebase/auth";
+import { auth, facebookProvider, googleProvider } from "../Server/FirebaseConfig";
+import Welcome from "./welcome";
 
 const AuthForm = () => {
   const navigate = useNavigate();
   const emailInputRef = useRef();
+  const [userFacebook, setUserFacebook] = useState(null);
+  const [userGoogle, setUserGoogle] = useState(null);
   const passwordInputRef = useRef();
   const confirmpasswordInputRef = useRef();
 
@@ -20,6 +26,28 @@ const AuthForm = () => {
 
   const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const facebookLoginHandler = () => {
+    signInWithPopup(auth, facebookProvider)
+      .then((result) => {
+        setUserFacebook(result.user);
+      })
+      .catch((err) => {
+        alert(err.message);
+      });
+  };
+  const googleLoginHandler = () => {
+    signInWithPopup(auth, googleProvider)
+      .then((result) => {
+        setUserGoogle(result.user);
+      })
+      .catch((err) => {
+        alert(err.message);
+      });
+  };
+  const logoutHandler = () => {
+    setUserFacebook(null);
+    setUserGoogle(null);
+  };
 
   const switchAuthModeHandler = () => {
     setIsLogin((prevState) => !prevState);
@@ -30,8 +58,8 @@ const AuthForm = () => {
     const enteredEmail = emailInputRef.current.value;
     const enteredPassword = passwordInputRef.current.value;
     let enteredConfirmPass;
-    if(!isLogin){
-       enteredConfirmPass = confirmpasswordInputRef.current.value;
+    if (!isLogin) {
+      enteredConfirmPass = confirmpasswordInputRef.current.value;
     }
     localStorage.setItem("enteredEmail", JSON.stringify(enteredEmail));
 
@@ -74,7 +102,7 @@ const AuthForm = () => {
             new Date().getTime() + +data.expiresIn * 1000
           );
           authCtx.login(data.idToken, expireTokentime.toISOString());
-          navigate("/");
+          navigate("/welcome");
         })
         .catch((err) => {
           alert(err.message);
@@ -116,7 +144,7 @@ const AuthForm = () => {
             new Date().getTime() + +data.expiresIn * 1000
           );
           authCtx.login(data.idToken, expireTokentime.toISOString());
-          navigate("/");
+          navigate("/welcome");
         })
         .catch((err) => {
           alert(err.message);
@@ -125,36 +153,52 @@ const AuthForm = () => {
   };
 
   return (
-    <div className={classes.auth}>
+    <Container className={classes["form-container"]}>
       <h1>{isLogin ? "Login" : "Sign Up"}</h1>
-      <Form>
-        <FormGroup className={classes.control}>
-          <FormLabel htmlFor="email">Your Email</FormLabel>
-          <FormControl type="email" id="email" required ref={emailInputRef} />
+      <Form className={classes.form}>
+        <FormGroup className={classes["form-group"]}>
+          <FormLabel htmlFor="email" className={classes.label}>
+            Your Email
+          </FormLabel>
+          <FormControl
+            type="email"
+            id="email"
+            required
+            ref={emailInputRef}
+            className={classes.input}
+          />
         </FormGroup>
-        <FormGroup className={classes.control}>
-          <FormLabel htmlFor="password">Your Password</FormLabel>
+        <FormGroup className={classes["form-group"]}>
+          <FormLabel htmlFor="password" className={classes.label}>
+            Your Password
+          </FormLabel>
           <FormControl
             type="password"
             id="password"
             required
             ref={passwordInputRef}
+            className={classes.input}
           />
         </FormGroup>
         {!isLogin && (
-          <FormGroup className={classes.control}>
-            <FormLabel htmlFor="password">Confirm Password</FormLabel>
+          <FormGroup className={classes["form-group"]}>
+            <FormLabel htmlFor="password" className={classes.label}>
+              Confirm Password
+            </FormLabel>
             <FormControl
               type="password"
               id="password"
               required
               ref={confirmpasswordInputRef}
+              className={classes.input}
             />
           </FormGroup>
         )}
-        <div className={classes.actions}>
+        <FormGroup className={classes.actions}>
           {!isLoading && (
-            <Button onClick={submitHandler}>{isLogin ? "Login" : "Create Account"}</Button>
+            <Button onClick={submitHandler}>
+              {isLogin ? "Login" : "Create Account"}
+            </Button>
           )}
           {isLoading && <p>Sending request...</p>}
           <Button
@@ -164,14 +208,51 @@ const AuthForm = () => {
           >
             {isLogin ? "Create new account" : "Login with existing account"}
           </Button>
-        </div>
+        </FormGroup>
       </Form>
-      <div className={classes.actions}>
-      <Link to="/reset">
-      {isLogin && (<button>Forget Password</button>)}
-      </Link>
+      <div>
+        <Link to="/reset">
+          {isLogin && (
+            <Button className={classes.btn1} variant="secondary">
+              Forget Password
+            </Button>
+          )}
+        </Link>
       </div>
-    </div>
+      <div>
+        {userGoogle ? (
+          <div>
+            <Welcome />
+            <Button onClick={logoutHandler}>LogOut</Button>
+            <h3>Welcome : {userGoogle.displayName}</h3>
+            <p>{userGoogle.email}</p>
+            <div>
+              <img src={userGoogle.photoURL} alt="Profile Photo" />
+              </div>
+          </div>
+        ) : (
+          <Button onClick={googleLoginHandler} className={classes.btn2} variant="danger">
+           Login with Google
+          </Button>
+        )}
+      </div>
+      <div>
+        {userFacebook ? (
+          <div>
+            <Button onClick={logoutHandler}>LogOut</Button>
+            <h3>Welcome : {userFacebook.displayName}</h3>
+            <p>{userFacebook.email}</p>
+            <div>
+              <img src={userFacebook.photoURL} alt="Profile Photo" />
+              </div>
+          </div>
+        ) : (
+          <Button onClick={facebookLoginHandler} className={classes.btn2}>
+           Login with FaceBook
+          </Button>
+        )}
+      </div>
+    </Container>
   );
 };
 
